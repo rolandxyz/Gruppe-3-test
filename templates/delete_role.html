@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Delete Role {% endblock %}</h1>
+<br>
+<form method="post" action="{{ url_for('delete_role') }}">
+    <div class="form-group">
+        <label for="role_id">Select Role:</label>
+        <select class="form-control" name="role_id" id="role_id" required>
+            {% for role in roles %}
+                <option value="{{ role.id }}">{{ role.name }}</option>
+            {% endfor %}
+        </select>
+    <br>
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary float-left">Back</a>
+    <button type="submit" class="btn btn-danger float-right">Delete Role</button>
+</form>
+
+
+{% endblock %}

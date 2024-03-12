@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Add Role {% endblock %}</h1>
+<br>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Roles:</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for role in roles %}
+            <tr>
+                <td>{{ role.name }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form method="post" action="{{ url_for('add_role') }}">
+    <div class="form-group">
+        <label for="role_name">New Role:</label>
+        <input type="text" class="form-control" name="role_name" id="role_name" value="{{ prev_role_name }}" required>
+        {% if error_role_exists %}
+            <p style="color: red;">{{ error_role_exists }}</p>
+        {% endif %}
+    </div>
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary float-left">Back</a>
+    <button type="submit" class="btn btn-success float-right">Add Role</button>
+</form>
+<br><br><br>
+{% if error %}
+<div class="alert alert-danger" role="alert">
+    {{ error }}
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Deliveries
+{% endblock %}
+
+{% block content %}
+<div class="container">
+{%  if current_user.role.name == 'warehouseworker' %}
+    <h1>Deliveries from Warehouse {{ warehouse_id }}</h1>
+{% endif %}
+{%  if current_user.role.name == 'helper' %}
+    <h1>Deliveries of Project {{ project_id }}</h1>
+{% endif %}
+
+    <div id="delivery-list" class="tab">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Departure</th>
+                    <th>Destination</th>
+                    <th>Project</th>
+                    <th>Box Amount</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for delivery in deliveries %}
+                <tr class="delivery" id="{{ delivery.id }}">
+                    <td>{{ delivery.id }}</td>
+                    <td>{{ delivery.departure.name }}</td>
+                    <td>
+                        {% if delivery.delivery_projects %}
+                            {% for project_delivery in delivery.delivery_projects %}
+                                {{ project_delivery.project.destination.name }}
+                            {% endfor %}
+                        {% else %}
+                            No project associated
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if delivery.delivery_projects %}
+                            {% for project_delivery in delivery.delivery_projects %}
+                                {{ project_delivery.project.name }}
+                            {% endfor %}
+                        {% else %}
+                            No project associated
+                        {% endif %}
+                    </td>
+                    <td>{{ delivery.boxes_count }}</td>
+                    <td>
+                        <select name="status" id="delivery-status">
+                            {% for status in all_statuses %}
+                                {% if status.id == delivery.status_id %}
+                                    <option value="{{ status.id }}" selected>{{ status.status }}</option>
+                                {% else %}
+                                    <option value="{{ status.id }}">{{ status.status }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button id="show-deliveries-btn-{{ delivery.id }}" class="btn btn-primary">Show Boxes</button>
+                        <div class="deliveries-container"></div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{%  if current_user.role.name == 'warehouseworker' %}
+    <div class="row mt-3">
+        <div class="col-auto">
+            <a href="{{ url_for('select_warehouse') }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+        <div class="col">
+            <a href="{{ url_for('create_delivery', warehouse_id=warehouse_id) }}" class="btn btn-success create-button btn-block">+</a>
+        </div>
+    </div>
+{% endif %}
+{%  if current_user.role.name == 'helper' %}
+    <div class="row mt-3">
+        <div class="col-auto">
+            <a href="{{ url_for('projects', location_id=location_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+    </div>
+{% endif %}
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("#delivery-list .delivery").forEach((delivery) => {
+            const deliveryId = delivery.id
+            const showDeliveriesBtn = delivery.querySelector(`#show-deliveries-btn-${deliveryId}`);
+
+            showDeliveriesBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                window.location.href = `deliveries/${deliveryId}/boxes`;
+            });
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("#delivery-list .delivery").forEach((delivery) => {
+            const selectStatus = delivery.querySelector("select[name='status']");
+
+            // Event-Listener für Änderungen im Dropdown-Menü
+            selectStatus.addEventListener("change", (event) => {
+                const statusId = event.target.value;
+                const deliveryId = delivery.id;
+
+                // AJAX-Aufruf mit XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `/update_delivery_status/${deliveryId}`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log("Status successfully updated:", xhr.responseText);
+                    }
+                };
+                xhr.send(JSON.stringify({ statusId: statusId }));
+            });
+        });
+    });
+</script>
+
+{% endblock %}

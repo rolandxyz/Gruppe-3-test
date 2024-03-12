@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create Deliveries
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Create Delivery</h1>
+    <form action="" method="POST">
+        <div class="form-group">
+            <label for="project_id">Select project:</label>
+            <select id="project_id" name="project_id" class="form-control" required>
+                {% for project in projects %}
+                    <option value="{{ project.id }}" data-destination="{{ project.destination.name }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="from-group">
+            <a href="{{ url_for('create_project', warehouse_id=warehouse_id, delivery_id=delivery_id) }}" class="btn btn-info create-button btn-block">Create Project</a>
+        </div>
+        <div class="form-group">
+            <label for="destination_name">Destination:</label>
+            <input type="text" id="destination_name" name="destination_name" class="form-control" readonly required>
+        </div>
+
+        <div class="form-group">
+            <label for="status_name">Choose Delivery Status:</label>
+            <select id="status_name" name="status_name" class="form-control" required>
+                {% for status in statuses %}
+                    {% if status.status == 'at storage' %}
+                        <option value="{{ status.status }}">{{ status.status }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="arrival_date">Arrival Date:</label>
+            <input type="date" id="arrival_date" name="arrival_date" class="form-control" required>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-auto">
+                <a href="{{ url_for('warehouse_deliveries', warehouse_id=warehouse_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-success create-button btn-block">Create Delivery</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const projectDropdown = document.getElementById("project_id");
+    const destinationInput = document.getElementById("destination_name");
+
+    // Funktion, um den Destination-Namen des ausgewählten Projekts in das Ziel-Eingabefeld einzufügen
+    function updateDestinationName() {
+        const projectId = projectDropdown.value;
+        const selectedProject = Array.from(projectDropdown.options).find(option => option.value === projectId);
+        const selectedDestination = selectedProject.dataset.destination;
+        destinationInput.value = selectedDestination;
+    }
+
+    // Event-Listener für Änderungen im Dropdown-Menü
+    projectDropdown.addEventListener("change", updateDestinationName);
+
+    // Initialisierung des Destination-Namens beim Laden der Seite
+    updateDestinationName();
+});
+</script>
+{% endblock %}

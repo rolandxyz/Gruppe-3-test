@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Boxes
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Boxes of Delivery {{ delivery_id }}</h1>
+
+    <div id="boxes-list" class="tab">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>GUID</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for box in boxes %}
+                <tr class="box" id="{{ box.id }}">
+                    <td>{{ box.id }}</td>
+                    <td>{{ box.guid }}</td>
+                    <td>{{ box.category.category }}</td>
+                    <td>{{ box.description }}</td>
+                    <td>
+                        <select name="status">
+                            {% for status in all_statuses %}
+                                {% if status.id == box.status_id %}
+                                    <option value="{{ status.id }}" selected>{{ status.status }}</option>
+                                {% else %}
+                                    <option value="{{ status.id }}">{{ status.status }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <button id="show-boxes-btn-{{ box.id }}" class="btn btn-primary">Show Ressources</button>
+                        <div class="boxes-container"></div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{%  if current_user.role.name == 'warehouseworker' %}
+    <div class="row mt-3">
+        <div class="col-auto">
+            <a href="{{ url_for('warehouse_deliveries', warehouse_id=warehouse_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+        <div class="col">
+            <a href="{{ url_for('create_box', warehouse_id=warehouse_id, delivery_id=delivery_id) }}" class="btn btn-success create-button btn-block">+</a>
+        </div>
+    </div>
+{% endif %}
+{%  if current_user.role.name == 'helper' %}
+    <div class="row mt-3">
+        <div class="col-auto">
+            <a href="{{ url_for('deliveries', location_id=location_id, project_id=project_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+    </div>
+{% endif %}
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("#boxes-list .box").forEach((box) => {
+            const boxID = box.id
+            const showBoxesBtn = box.querySelector(`#show-boxes-btn-${boxID}`);
+
+            showBoxesBtn.addEventListener("click", (event) => {
+                event.preventDefault();
+                window.location.href = `boxes/${boxID}/ressources`;
+            });
+        });
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("#boxes-list .box").forEach((box) => {
+            const selectStatus = box.querySelector("select[name='status']");
+
+            // Event-Listener für Änderungen im Dropdown-Menü
+            selectStatus.addEventListener("change", (event) => {
+                const statusId = event.target.value;
+                const boxId = box.id;
+
+                // AJAX-Aufruf mit XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `/update_box_status/${boxId}`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log("Status successfully updated:", xhr.responseText);
+                    }
+                };
+                xhr.send(JSON.stringify({ statusId: statusId }));
+            });
+        });
+    });
+</script>
+{% endblock %}

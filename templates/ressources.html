@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Boxes
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Ressources of Box {{ box_id }}</h1>
+
+    <div id="ressources-list" class="tab">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Number</th>
+                    <th>GUID</th>
+                    <th>Material</th>
+                    <th>Amount</th>
+                    <th>Unit</th>
+                    <th>Amount p.U.</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ressource in ressources %}
+                <tr class="ressource" id="{{ ressource.guid }}">
+                    <td>{{ ressource.id }}</td>
+                    <td>{{ ressource.guid }}</td>
+                    <td>{{ ressource.description }}</td>
+                    <td><input type="text" name="amount" value="{{ ressource.amount }}" class="col-auto"></td>
+                    <td>{{ ressource.unit.unit }}</td>
+                    <td>{{ ressource.amount_unit }}</td>
+                    <td>
+                        <select name="status">
+                            {% for status in all_statuses %}
+                                {% if status.id == ressource.status_id %}
+                                    <option value="{{ status.id }}" selected>{{ status.status }}</option>
+                                {% else %}
+                                    <option value="{{ status.id }}">{{ status.status }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="row mt-3">
+    {%  if current_user.role.name == 'warehouseworker' %}
+        <div class="col-auto">
+            <a href="{{ url_for('warehouse_boxes', warehouse_id=warehouse_id, delivery_id=delivery_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+    {% endif %}
+    {%  if current_user.role.name == 'helper' %}
+        <div class="col-auto">
+            <a href="{{ url_for('boxes', delivery_id=delivery_id, location_id=location_id, project_id=project_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+        </div>
+    {% endif %}
+        <div class="col">
+            <a href="" class="btn btn-success create-button btn-block">print as .pdf</a>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        document.querySelectorAll("#ressources-list .ressource").forEach((ressource) => {
+            const amountInput = ressource.querySelector("input[name='amount']");
+            const resourceId = ressource.querySelector("td:first-child").textContent;
+
+            amountInput.addEventListener("input", (event) => {
+                const newAmount = event.target.value;
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `/update_resource_amount/${resourceId}`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log("Amount successfully updated:", xhr.responseText);
+                    }
+                };
+                xhr.send(JSON.stringify({ amount: newAmount }));
+            });
+
+            const selectStatus = ressource.querySelector("select[name='status']");
+
+            selectStatus.addEventListener("change", (event) => {
+                const statusId = event.target.value;
+
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", `/update_ressource_status/${resourceId}`, true);
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log("Status successfully updated:", xhr.responseText);
+                    }
+                };
+                xhr.send(JSON.stringify({ statusId: statusId }));
+            });
+        });
+    });
+</script>
+{% endblock %}

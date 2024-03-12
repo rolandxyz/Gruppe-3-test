@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Select warehouse
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form action='' method="post">
+            <label for="selected_warehouse">Please choose a warehouse:</label>
+            <br>
+            <select class="form-control" name="selected_warehouse" id="selected_warehouse">
+                {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}">{{ warehouse.name }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <button type="submit" class="btn btn-success btn-block">Select warehouse</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

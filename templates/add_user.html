@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Add User {% endblock %}</h1>
+<br>
+<form method="post" action="{{ url_for('add_user') }}">
+    <div class="form-group">
+        <label for="firstname">Firstname:</label>
+        <input type="text" class="form-control" name="firstname" id="firstname" value="{{ prev_firstname }}" required>
+    </div>
+    <div class="form-group">
+        <label for="lastname">Lastname:</label>
+        <input type="text" class="form-control" name="lastname" id="lastname" value="{{ prev_lastname }}" required>
+    </div>
+    <div class="form-group">
+        <label for="username">Username:</label>
+        <input type="text" class="form-control" name="username" id="username" value="{{ prev_username }}" required>
+        {% if error_username %}
+            <p style="color: red;">{{ error_username }}</p>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" class="form-control" name="password" id="password" value="{{ prev_password }}" required>
+    </div>
+    <div class="form-group">
+        <label for="confirm_password">Confirm password:</label>
+        <input type="password" class="form-control" name="confirm_password" id="confirm_password" value="{{ prev_confirm_password }}" required>
+        {% if error_password %}
+            <p style="color: red;">{{ error_password }}</p>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label for="role_id">Role:</label>
+        <select class="form-control" name="role_id" id="role_id">
+            {% for role in roles %}
+                <option value="{{ role.id }}" {% if role.id == prev_role_id | int %} selected="" {% endif %}>{{ role.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary float-left">Back</a>
+    <button type="submit" class="btn btn-success float-right">Add User</button>
+</form>
+
+{% endblock %}

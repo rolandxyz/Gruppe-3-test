@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Select location
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form action='' method="post">
+            <label for="selected_location">Please choose your current location:</label>
+            <br>
+            <select class="form-control" name="selected_location" id="selected_location">
+                {% for location in locations %}
+                    <option value="{{ location.id }}">{{ location.name }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <button type="submit" class="btn btn-success btn-block">Select location</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

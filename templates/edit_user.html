@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Edit User {% endblock %}</h1>
+<br>
+<form method="post" action="{{ url_for('edit_user') }}">
+    <div class="form-group">
+        <label for="user_id">Select User:</label>
+        <select class="form-control" name="user_id" id="user_id">
+            {% for user in users %}
+                <option value="{{ user.id }}"  {% if user.id == prev_user_id | int %} selected="" {% endif %}>{{ user.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="new_password">New Password:</label>
+        <input type="password" class="form-control" name="new_password" id="new_password" value="{{ prev_new_password }}">
+    </div>
+    <div class="form-group">
+        <label for="confirm_new_password">Confirm new Password:</label>
+        <input type="password" class="form-control" name="confirm_new_password" id="confirm_new_password" value="{{ prev_confirm_new_password }}">
+        {% if error_unidentical_passwords %}
+            <p style="color: red;">{{ error_unidentical_passwords }}</p>
+        {% endif %}
+        {% if error_same_password %}
+            <p style="color: red;">{{ error_same_password }}</p>
+        {% endif %}
+    </div>
+    <div class="form-group">
+        <label for="new_role_id">New Role:</label>
+        <select class="form-control" name="new_role_id" id="new_role_id">
+            {% for role in roles %}
+                <option value="{{ role.id }}" {% if role.id == prev_role_id | int %} selected="" {% endif %}>{{ role.name }}</option>
+            {% endfor %}
+        </select>
+        {% if error_same_role %}
+            <p style="color: red;">{{ error_same_role }}</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary float-left">Back</a>
+    <button type="submit" class="btn btn-success float-right">Edit User</button>
+</form>
+<br>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{% block title %} Routes & Permissions {% endblock %}</h1>
+<br>
+<form method="post" action="{{ url_for('routes') }}">
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                {% for role in roles %}
+                    <th>{{ role.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for route in permissions %}
+                <tr>
+                    <td>{{ route.name }}</td>
+                    {% for role in roles %}
+                        <td><input type="checkbox" name="permissions" value="{{ role.id }}_{{ route.id }}" {% if role_permission_mapping[role.id][route.id] %}checked{% endif %}></td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary float-left">Back</a>
+    <button type="submit" class="btn btn-success float-right">Update permissions</button>
+</form>
+
+{% endblock %}

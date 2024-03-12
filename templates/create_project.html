@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Create Project
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Create Project</h1>
+    <form method="POST" action="{{ url_for('create_project', warehouse_id=warehouse_id) }}">
+        <div class="form-group">
+            <label for="project_name">Project Name:</label>
+            <input type="text" id="project_name" name="project_name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="destination_name">Destination:</label>
+            <input type="text" id="destination_name" name="destination_name" class="form-control" required>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-auto">
+                <a href="{{ url_for('create_delivery', warehouse_id=warehouse_id) }}" class="btn btn-secondary back-button btn-block">Back</a>
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-success create-button btn-block">Create Project</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
